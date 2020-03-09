@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# filehasher.py - Redis demo by Kåre Hampf <kare.hampf@ha.ax>
+# redis-dupfilefinder.py - Redis example  by Kåre Hampf <khampf@users.sourceforge.com>
 #
 
 import hashlib
@@ -22,8 +22,9 @@ def adler32(fname):
             checksum = zlib.adler32(chunk, checksum)
     return checksum
 
-
+# (Stack Overflow, Generating an MD5 checksum of a file,
 # https://stackoverflow.com/questions/3431825/generating-an-md5-checksum-of-a-file#3431838
+# [2020-03-09])
 def md5(fname):
     hash_md5 = hashlib.md5()
     with open(fname, "rb") as f:
@@ -32,7 +33,9 @@ def md5(fname):
     return hash_md5.hexdigest()
 
 
-# Print iterations progress (https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console)
+# (Stack Overflow, Text Progress Bar in the Console,
+# https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
+# [2020-03-09])
 def progressbar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printend="\r"):
     """
     Call in a loop to create terminal progress bar
@@ -86,8 +89,6 @@ print('Collected %d paths in list' % pathcount)
 
 print('Determining file sizes...')
 progress = 0
-# while r.llen('filepaths') > 1:
-#    filepath = r.lpop('filepaths').decode('utf-8')
 for filepath in r.lrange('filepaths', 0, -1):
     size: int = os.path.getsize(filepath)
     if size > 0:  # ignore empty files
@@ -109,10 +110,8 @@ samesizes = r.zrangebyscore('sizecount', 2, 'inf')
 progress = 0
 for sizekey in samesizes:
     size: int = int(sizekey.decode('utf-8')[len('size:'):])
-    # print("%d bytes:" % size)
     for filepath in r.hgetall(sizekey):
         adlerkey = "adler:%08x" % adler32(filepath)
-        # print(" %s: %db \"%s\"" % (adlerkey, size, filepath.decode('utf-8')))
         r.zincrby('adlercount', 1, adlerkey)
         r.hset(adlerkey, filepath, size)
 
@@ -132,7 +131,6 @@ for adlerkey in sameadlers:
     size: int = int(r.hvals(adlerkey)[0])  # grab size from first field value
     for filepath in r.hgetall(adlerkey):
         md5sum = md5(filepath)
-        # print("%s %db %s" % (md5sum, size, filepath.decode('utf-8')))
         r.zincrby('md5count', 1, md5sum)
         r.hset(md5sum, filepath, size)
 
