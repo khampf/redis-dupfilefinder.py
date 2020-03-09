@@ -4,14 +4,14 @@ _by Kåre Hampf 2020_
 A small utility written in Python for finding duplicate files within given paths using methods found in Redis. Tested both under plain Linux and using Python in Windows 10 with redis-server running in an Ubuntu 18.04LTS WSL (Windows Subsystem for Linux).
 
 ## Requirements
-* Python3
-* redis-libraries (```pip install redis```)
+* Python3.
+* redis-libraries (`pip install redis`) and perhaps zlib and hashlib libraries if not included in your default install.
 * A redis-server. Can be started as user without password and it will work out-of-the-box. If you need to use a password then eedit the Python-script.
 
 ## Usage
 1. Start a redis server instance for example using `redis-server` on Linux or the Linux-subsystem in Windows.
 
-2. Run `python redis-dupfilefinder.py PATH1 PATH2 ... PATHn` or without arguments to list previously found duplicate files from database. The script can also be run with executable attribute set using the hashbang-property (#!/usr/bin/python) on most systems.
+2. Run `python redis-dupfilefinder.py PATH1 PATH2 ... PATHn` or without arguments to list previously found duplicate files from database. The script can also be invoked using the hashbang-property (#!/usr/bin/python) with the executable bit set.
 
 ### Example:
 
